@@ -1,0 +1,10 @@
+tensorflow=1.14.0
+keras
+numpy=1.16.2
+nltk
+pillow
+opencv-python
+flask
+gevent
+scipy=1.1.0
+

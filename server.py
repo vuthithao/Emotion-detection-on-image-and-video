@@ -123,7 +123,6 @@ def emotion(data_type):
             face['emotion'] = a
             result.append(face)
 
-    print(result)
     end = time.time() - start
     response = jsonify({"result": result, "time": end, "status_code": 200})
     response.status_code = 200
