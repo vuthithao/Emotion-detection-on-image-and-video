@@ -30,15 +30,18 @@ image_size=160
 margin= 44
 gpu_memory_fraction=1.0
 
-def load_and_align_data(image_path, image_size,margin, gpu_memory_fraction):
-    minsize = 20 # minimum size of face
-    threshold = [ 0.6, 0.7, 0.7 ]  # three steps's threshold
-    factor = 0.709 # scale factor
-    with tf.Graph().as_default():
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_memory_fraction)
-        sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
-        with sess.as_default():
-            pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
+# sess_cpu = tf.Session(config=tf.ConfigProto(device_count={'GPU': 0}))
+with tf.Graph().as_default():
+    # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_memory_fraction)
+    sess = tf.Session(config=tf.ConfigProto(device_count={'GPU': 0}))
+    with sess.as_default():
+        pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
+
+def load_and_align_data(image_path, image_size,margin,pnet, rnet, onet):
+    minsize = 20  # minimum size of face
+    threshold = [0.6, 0.7, 0.7]  # three steps's threshold
+    factor = 0.709  # scale factor
+
     img = scipy.misc.imread(os.path.expanduser(image_path))
     img_size = np.asarray(img.shape)[0:2]
     bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
@@ -91,7 +94,7 @@ def emotion(data_type):
     img_path = "tmp.jpg"
     cv2.imwrite(img_path, img)
     # img = cv2.imread(img_path)
-    detect_face, have_face = load_and_align_data(img_path, image_size, margin, gpu_memory_fraction)
+    detect_face, have_face = load_and_align_data(img_path, image_size, margin, pnet, rnet, onet)
     if (have_face != 0):
         detect_face = np.reshape(detect_face, (-1, 4))
         result = []
